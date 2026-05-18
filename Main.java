@@ -20,7 +20,7 @@ class Patient implements Comparable<Patient> {
         }
         return Integer.compare(this.arrivalTime, other.arrivalTime); 
     }
-}
+} 
 
 class HospitalQueue {
     PriorityQueue<Patient> emergencyQueue = new PriorityQueue<>();
@@ -116,15 +116,13 @@ WHERE
     try {
         await client.query('BEGIN');
 
-        // ป้องกัน SQL Injection ด้วย $1 และแก้ Race Condition ด้วย FOR UPDATE
         const { rows } = await client.query(
             `SELECT limit FROM patients WHERE id = $1 FOR UPDATE`, 
             [patientId]
         );
 
-        const p = rows[0]; // ดึงข้อมูลมาใช้เลยตาม Logic เดิม
+        const p = rows[0]; 
 
-        // ตรวจสอบวงเงินประกัน
         if (p.limit >= treatmentCost) {
             const newLimit = p.limit - treatmentCost;
 
@@ -137,7 +135,6 @@ WHERE
             return true;
         }
         
-        // ถ้ายอดไม่พอ ให้ Rollback คืนสถานะ
         await client.query('ROLLBACK');
         return false;
 
@@ -218,9 +215,11 @@ Role
 //ข้อ 5 
 System Scalability — Lab Results
 
-โรงพยาบาลควรใช้ระบบ PACS ร่วมกับ Cloud/Object Storage สำหรับจัดเก็บภาพ X-Ray ความละเอียดสูง และแยกเป็น Hot Storage สำหรับไฟล์ที่ใช้งานบ่อย และ Cold Storage สำหรับข้อมูลเก่า เพื่อรองรับการขยายตัวของข้อมูลในอนาคต
+โรงพยาบาลควรใช้ระบบ PACS ร่วมกับ Cloud/Object Storage สำหรับจัดเก็บภาพ X-Ray ความละเอียดสูง และแยกเป็น 
+Hot Storage สำหรับไฟล์ที่ใช้งานบ่อย และ Cold Storage สำหรับข้อมูลเก่า เพื่อรองรับการขยายตัวของข้อมูลในอนาคต
 
-เพื่อให้แพทย์เปิดภาพผ่าน Mobile ได้ลื่นไหล ควรใช้ Image Compression เช่น JPEG2000 หรือ WebP ลดขนาดไฟล์ รวมถึงใช้ Progressive Loading โหลดภาพแบบค่อยเป็นค่อยไป และติดตั้ง Internal CDN/Cache Server ภายในโรงพยาบาลเพื่อลด Latency และลดภาระของ Server หลัก
+เพื่อให้แพทย์เปิดภาพผ่าน Mobile ได้ลื่นไหล ควรใช้ Image Compression เช่น JPEG2000 หรือ WebP ลดขนาดไฟล์ 
+รวมถึงใช้ Progressive Loading โหลดภาพแบบค่อยเป็นค่อยไป และติดตั้ง Internal CDN/Cache Server ภายในโรงพยาบาลเพื่อลด Latency และลดภาระของ Server หลัก
 
 Data Privacy (PDPA)
 
